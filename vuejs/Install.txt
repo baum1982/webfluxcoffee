@@ -1,0 +1,11 @@
+// vue-cli 전역 설치, 권한에러시 sudo 추가
+npm install -g vue-cli
+
+// vue init <template-name> <project-name>
+vue init webpack coffee
+
+cd coffee
+
+npm start [OR] npm run dev
+
+num run build

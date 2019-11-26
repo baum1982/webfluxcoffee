@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <title>sample</title>
+
+    </head>
+    <body>
+
+        <div id="app">
+            <h3>{{message}}</h3>
+            <my-global-component></my-global-component>
+            <my-local-component></my-local-component>
+            <child-component 
+                v-bind:propsdata='message'
+                v-on:show-log='printText'
+            ></child-component>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script> -->
+        <script>
+            var eventBus = new Vue();
+
+            Vue.component('my-global-component',{
+                template: '<div>전역 컴포넌트: {{compData}}</div>',
+                data: function(){
+                    return {compData : 'global'}
+                } 
+            }); 
+
+            Vue.component('child-component',{
+                template: '<div>하위 컴포넌트: {{propsdata}}'
+                        +'  <button v-on:click="showLog">show</button>'
+                        +'  <button v-on:click="bus">bus</button></div>',
+                props:['propsdata'],
+               
+                data: function(){
+                    return {compData : 'child'}
+                },
+                methods:{
+                    showLog: function(){
+                        console.log('emit');
+                        this.$emit('show-log');
+                    },
+                    bus: function(){
+                        eventBus.$emit('triggerEventBus', 100);
+                    }
+                } 
+            }); 
+
+            var app = new Vue({
+                el: "#app",
+                data: {
+                    message: "Hello !"
+                },
+                methods:{
+                    printText: function(){
+                        console.log('이벤트 수신');
+                    },
+                    
+                },
+                components:{
+                    'my-local-component':{
+                        template: '<div>지역 컴포넌트: {{compData}}</div>',
+                        data: function(){
+                            return {compData : 'local'}
+                        }
+                    }
+                },
+                beforeCreate : function(){
+                    console.log('beforCreate : %s', this.message);
+                },
+                created : function(){
+                    console.log('created: %s', this.message);
+
+                    eventBus.$on('triggerEventBus', function(value){
+                        console.log('eventBus 수신 : ' + value);
+                    });
+
+                },
+                mounted : function(){
+                    console.log('mounted: %s', this.message);
+                    this.message = "pass parent comp data"
+                },
+                beforeUpdate : function(){
+                    console.log('beforeUpdate: %s', this.message);
+                },
+                updated : function(){
+                    console.log('updated: %s', this.message);
+                },
+            }); 
+        </script>
+      </body>
+</html>
